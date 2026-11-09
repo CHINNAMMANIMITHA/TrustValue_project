@@ -1,0 +1,13 @@
+{% extends "base.html" %}{% block title %}Login · TrustVault{% endblock %}
+{% block content %}
+<section class="auth-card">
+  <h1>Welcome back</h1><p class="muted">Sign in to your secure document workspace.</p>
+  <form method="post">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <label>Username or email</label><input name="identity" required autocomplete="username">
+    <label>Password</label><input type="password" name="password" required autocomplete="current-password">
+    <button class="primary full" type="submit">Login</button>
+  </form>
+  <p class="muted center">New here? <a href="{{ url_for('register') }}">Create an owner account</a></p>
+</section>
+{% endblock %}

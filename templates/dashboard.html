@@ -1,0 +1,15 @@
+{% extends "base.html" %}{% block title %}Dashboard · TrustVault{% endblock %}
+{% block content %}
+<h1>{% if audit_only %}Audit trail{% else %}Dashboard{% endif %}</h1>
+{% if not audit_only %}
+<p class="muted">Welcome, {{ current_user.username }}. Your documents are protected by server-side access checks.</p>
+<div class="stats"><div class="stat"><strong>{{ documents|length }}</strong><span>Accessible documents</span></div><div class="stat"><strong>{{ current_user.role|title }}</strong><span>Your role</span></div></div>
+<a class="primary button-link" href="{{ url_for('documents') }}">Manage documents</a>
+{% endif %}
+{% if current_user.role == 'admin' %}
+<section class="panel"><h2>Recent activity</h2>
+{% if logs %}<div class="table-wrap"><table><tr><th>Time (UTC)</th><th>User ID</th><th>Action</th><th>Target</th><th>Details</th><th>IP</th></tr>
+{% for log in logs %}<tr><td>{{ log.created_at }}</td><td>{{ log.actor_id or 'Anonymous' }}</td><td>{{ log.action }}</td><td>{{ log.target_type or '-' }} #{{ log.target_id or '-' }}</td><td>{{ log.details or '-' }}</td><td>{{ log.ip_address or '-' }}</td></tr>{% endfor %}
+</table></div>{% else %}<p class="muted">No activity recorded yet.</p>{% endif %}</section>
+{% endif %}
+{% endblock %}

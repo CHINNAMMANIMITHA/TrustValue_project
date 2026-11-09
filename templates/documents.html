@@ -1,0 +1,44 @@
+{% extends "base.html" %}{% block title %}Documents · TrustVault{% endblock %}
+{% block content %}
+<div class="page-heading"><div><h1>Documents</h1><p class="muted">Files are stored outside the public static directory.</p></div></div>
+{% if current_user.role in ['owner','admin'] %}
+<section class="panel"><h2>Upload document</h2>
+<form method="post" enctype="multipart/form-data" class="upload-form">
+<input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+<input type="file" name="file" required accept=".pdf,.txt,.png,.jpg,.jpeg,.doc,.docx,.xlsx,.csv">
+<button class="primary" type="submit">Upload</button>
+</form><small class="muted">Allowed: PDF, TXT, PNG, JPG, DOC, DOCX, XLSX, CSV · Maximum 10 MB</small>
+</section>
+{% endif %}
+<section class="panel">
+<form method="get" class="search-form"><input name="q" value="{{ request.args.get('q','') }}" placeholder="Search by filename"><button class="secondary">Search</button></form>
+{% if documents %}
+<div class="document-list">
+{% for doc in documents %}
+<article class="document">
+<div class="doc-icon">📄</div><div class="doc-info"><strong>{{ doc.original_name }}</strong><span>{{ (doc.file_size / 1024)|round(1) }} KB · Uploaded {{ doc.created_at }}</span></div>
+<a class="secondary button-link" href="{{ url_for('download_document', document_id=doc.id) }}">Download</a>
+{% if current_user.role == 'admin' or doc.owner_id == current_user.id %}
+<form method="post" action="{{ url_for('share_document', document_id=doc.id) }}" class="share-form">
+<input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+<input type="email" name="email" placeholder="User email to share" required>
+<label><input type="checkbox" name="can_read" checked> Read</label>
+<label><input type="checkbox" name="can_edit"> Edit</label>
+<button class="secondary" type="submit">Save access</button>
+</form>
+<form method="post" action="{{ url_for('delete_document', document_id=doc.id) }}" onsubmit="return confirm('Delete this document permanently?')">
+<input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><button class="danger">Delete</button>
+</form>
+{% endif %}
+{% if current_user.role == 'admin' or doc.owner_id == current_user.id %}
+<details class="rename"><summary>Rename</summary>
+<form method="post" action="{{ url_for('rename_document', document_id=doc.id) }}">
+<input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><input name="name" value="{{ doc.original_name }}" required><button class="secondary">Save name</button>
+</form></details>
+{% endif %}
+</article>
+{% endfor %}
+</div>
+{% else %}<p class="muted">No documents found. Upload a document or ask its owner to share it with your account.</p>{% endif %}
+</section>
+{% endblock %}

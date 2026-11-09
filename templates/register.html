@@ -1,0 +1,14 @@
+{% extends "base.html" %}{% block title %}Register · TrustVault{% endblock %}
+{% block content %}
+<section class="auth-card">
+  <h1>Create account</h1><p class="muted">New public accounts are created as document owners.</p>
+  <form method="post">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <label>Username</label><input name="username" minlength="3" maxlength="80" required>
+    <label>Email</label><input type="email" name="email" maxlength="160" required>
+    <label>Password (minimum 8 characters)</label><input type="password" name="password" minlength="8" required autocomplete="new-password">
+    <button class="primary full" type="submit">Create account</button>
+  </form>
+  <p class="muted center">Already registered? <a href="{{ url_for('login') }}">Login</a></p>
+</section>
+{% endblock %}
